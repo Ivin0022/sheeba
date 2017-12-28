@@ -1,11 +1,18 @@
-from socket import socket
-from socket import SOCK_DGRAM as UDP
+import sys
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtNetwork import QUdpSocket
 
-ip_addr = ('127.0.0.1', 5020)
+app = QApplication(sys.argv)
+
+conn = QUdpSocket()
+conn.bind(5020)
 
 
-with socket(type=UDP) as conn:  # UDP
-    conn.bind(ip_addr)
-    while True:
-        data, addr = conn.recvfrom(1024)  # buffer size is 1024 bytes
-        print("received message:", data)
+@conn.readyRead.connect
+def func():
+    while conn.hasPendingDatagrams():
+        datagram, host, port = conn.readDatagram(conn.pendingDatagramSize())
+    print(datagram)
+
+
+sys.exit(app.exec_())
