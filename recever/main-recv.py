@@ -6,18 +6,20 @@ from PyQt5.QtNetwork import QUdpSocket
 import numpy as np
 
 from plot import Canvas
-
-pStructure = [
-    ('name', 'a10'),
-    ('data', float, (9,))
-]
+from packetStructure import pStructure
 
 
 class sPlot(Canvas):
+    def __init__(self, *args, **kwargs):
+        Canvas.__init__(self, *args, **kwargs)
+
     def setup(self):
-        t = np.arange(0.0, 3.0, 0.01)
-        s = np.sin(2 * np.pi * t)
-        self.axes.plot(t, s)
+        self.axes.plot(list(range(9)), [0] * 9)
+
+    def updateFigure(self, data, col='r'):
+        self.axes.cla()
+        self.axes.plot(list(range(9)), data, col)
+        self.draw()
 
 
 app = QApplication(sys.argv)
@@ -34,7 +36,7 @@ def func():
         dataSize = conn.pendingDatagramSize()
         datagram, host, port = conn.readDatagram(dataSize)
 
-    datagram = np.fromstring(datagram, dtype=pStructure)
+    datagram = np.fromstring(datagram, dtype=pStructure)[0]
     print(datagram)
 
     name = str(datagram['name'])
@@ -43,6 +45,7 @@ def func():
         windows[name] = sPlot()
         windows[name].setWindowTitle(name)
         windows[name].show()
+    windows[name].updateFigure(datagram['data'])
 
 
 w = QWidget()
