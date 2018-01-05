@@ -5,27 +5,16 @@ from PyQt5.QtNetwork import QUdpSocket
 
 import numpy as np
 
-from plot import Canvas
+from plots import sPlot
 from packetStructure import pStructure
-
-
-class sPlot(Canvas):
-    def __init__(self, *args, **kwargs):
-        Canvas.__init__(self, *args, **kwargs)
-
-    def setup(self):
-        self.axes.plot(list(range(9)), [0] * 9)
-
-    def updateFigure(self, data, col='r'):
-        self.axes.cla()
-        self.axes.plot(list(range(9)), data, col)
-        self.draw()
 
 
 app = QApplication(sys.argv)
 
 windows = {}
 
+# TO DO: give the socket a parent, right now it's most likely
+# being freed from memory by the GC at the end of execution
 conn = QUdpSocket()
 conn.bind(5020)
 
@@ -39,7 +28,8 @@ def func():
     datagram = np.fromstring(datagram, dtype=pStructure)[0]
     print(datagram)
 
-    name = str(datagram['name'])
+    # to convert from bytes to string
+    name = datagram['name'].decode('utf-8')
     print(name)
     if name not in windows:
         windows[name] = sPlot()
