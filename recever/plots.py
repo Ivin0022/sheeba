@@ -10,5 +10,5 @@ class sPlot(Canvas):
 
     def updateFigure(self, data, col='r'):
         self.axes.cla()
-        self.axes.plot(list(range(9)), data, col)
+        self.axes.plot(data, col)
         self.draw()
