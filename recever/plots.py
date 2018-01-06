@@ -6,7 +6,7 @@ class sPlot(Canvas):
         Canvas.__init__(self, *args, **kwargs)
 
     def setup(self):
-        self.axes.plot(list(range(9)), [0] * 9)
+        self.axes.plot([0] * 9)
 
     def updateFigure(self, data, col='r'):
         self.axes.cla()

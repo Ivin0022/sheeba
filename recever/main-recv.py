@@ -1,6 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QDockWidget
 from PyQt5.QtNetwork import QUdpSocket
 
 import numpy as np
@@ -8,14 +9,15 @@ import numpy as np
 from plots import sPlot
 from packetStructure import pStructure
 
-
+windows = {}
+ 
 app = QApplication(sys.argv)
 
-windows = {}
+w = QMainWindow()
 
 # TO DO: give the socket a parent, right now it's most likely
 # being freed from memory by the GC at the end of execution
-conn = QUdpSocket()
+conn = QUdpSocket(w)
 conn.bind(5020)
 
 
@@ -30,15 +32,18 @@ def func():
 
     # to convert from bytes to string
     name = datagram['name'].decode('utf-8')
-    print(name)
+
+    # TODO: consider using defaultdict 
+    # (defaultdict maybe more diffcult for aunty to understand)
     if name not in windows:
-        windows[name] = sPlot()
-        windows[name].setWindowTitle(name)
-        windows[name].show()
-    windows[name].updateFigure(datagram['data'])
+        tmpDock = QDockWidget(name, w)
+        tmpDock.setWidget(sPlot())
+        tmpDock.setFloating(True)
+        tmpDock.show()
+        windows[name] = tmpDock
+    windows[name].widget().updateFigure(datagram['data'])
 
-
-w = QWidget()
+w.setGeometry(100, 100, 600, 400)
 w.show()
 
 sys.exit(app.exec_())
