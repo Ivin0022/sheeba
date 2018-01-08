@@ -1,4 +1,4 @@
-from AbstractPlotCanvas import Canvas
+from lib.Abstract.PlotCanvas import Canvas
 
 
 class sPlot(Canvas):
